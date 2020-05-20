@@ -64,6 +64,14 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true },
 
         db.collection('tasks').deleteMany({ age: 27 })
             .then(response => console.log(response))
-            .catch(error => console.log(error))     
+            .catch(error => console.log(error))   
+            
+            
+        //updateOne
+        //updateMany
+        //deleteOne
+        //deleteMany
+        //find
+        //findOne
 
 })
