@@ -15,9 +15,35 @@ const User = mongoose.model('User', {
     }
 })
 
-const me = new User({username: "drewski", age: 12})
-me.save()
-    .then((resp) => console.log(me))
-        .catch((error) => console.log(error))
+const Mixtape = mongoose.model('Mixtape', {
+    title: {
+        type: String
+    },
+    description: {
+        type: String
+    },
+    color: {
+        type: String
+    },
+    backgroundColor: {
+        type: String
+    },
+    private: {
+        type: Boolean
+    },
+    collaborative: {
+        type: Boolean
+    }
+})
+
+// const me = new User({username: "drewski", age: 12})
+// me.save()
+//     .then((resp) => console.log(me))
+//         .catch((error) => console.log(error))
 
 
+// const mt = new Mixtape({title: "The Lit", description: "test", color: "red", 
+// backgroundColor: "blue", private: false, collaborative: false})
+// mt.save()
+//     .then((resp) => console.log(mt))
+//         .catch((error) => console.log(error))
