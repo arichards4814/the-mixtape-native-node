@@ -1,6 +1,7 @@
 const express = require('express')
 require('./db/mongoose')
 const User = require('./models/user')
+const Mixtape = require('./models/mixtape')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -17,6 +18,17 @@ app.post('/users', (req, res) => {
     .catch((error) => {
         res.status(400).send(error)
     })
+})
+
+
+app.post('/mixtapes', (req, res) => {
+    const mixtape = new Mixtape(req.body)
+    mixtape.save().then(() => {
+        res.send(mixtape)
+    })
+        .catch((error) => {
+            res.status(400).send(error)
+        })
 })
 
 

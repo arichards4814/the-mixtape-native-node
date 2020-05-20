@@ -3,10 +3,13 @@ const validator = require('validator')
 
 const Mixtape = mongoose.model('Mixtape', {
     title: {
-        type: String
+        type: String,
+        required: true
     },
     description: {
-        type: String
+        type: String,
+        maxlength: [260, "Cannot have more than 260 characters."],
+        trim: true
     },
     color: {
         type: String
@@ -15,12 +18,14 @@ const Mixtape = mongoose.model('Mixtape', {
         type: String
     },
     private: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     collaborative: {
-        type: Boolean
+        type: Boolean,
+        default: false
     }
 })
 
 
-module.exports = User
+module.exports = Mixtape
