@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator')
 
 mongoose.connect('mongodb://127.0.0.1:27017/the-mixtape-api', { 
     useUnifiedTopology: true,
@@ -8,10 +9,29 @@ mongoose.connect('mongodb://127.0.0.1:27017/the-mixtape-api', {
 
 const User = mongoose.model('User', {
     username: {
-        type: String
+        type: String,
+        required: true,
+        trim: true
     },
     age: {
-        type: Number
+        type: Number,
+        validate(value) {
+            if(value < 0){
+                throw new Error('Age must be a positive number.')
+            }
+        },
+        default: 0
+    },
+    email: {
+        type: String,
+        required: true,
+        validate(value){
+            if (!validator.isEmail(value)){
+                throw new Error('Email is invalid.')
+            }
+        },
+        trim: true,
+        lowercase: true
     }
 })
 
@@ -36,10 +56,10 @@ const Mixtape = mongoose.model('Mixtape', {
     }
 })
 
-// const me = new User({username: "drewski", age: 12})
-// me.save()
-//     .then((resp) => console.log(me))
-//         .catch((error) => console.log(error))
+const me = new User({ username: "  Jerry  ", email: "mike@com.com"})
+me.save()
+    .then((resp) => console.log(me))
+        .catch((error) => console.log(error))
 
 
 // const mt = new Mixtape({title: "The Lit", description: "test", color: "red", 
