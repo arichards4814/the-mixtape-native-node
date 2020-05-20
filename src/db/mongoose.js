@@ -68,6 +68,21 @@ const Mixtape = mongoose.model('Mixtape', {
     }
 })
 
+const Badge = mongoose.model('Badge', {
+    name: {
+        type: String,
+        required: true,
+        maxlength: [20, "Cannot have more than 20 characters."],
+        trim: true
+    },
+    description: {
+        type: String,
+        required: true,
+        maxlength: [260, "Cannot have more than 260 characters."],
+        trim: true
+    }
+})
+
 const me = new User({ username: "Billy123", email: "mike@com.com", password: "password"})
 me.save()
     .then((resp) => console.log(me))
