@@ -39,15 +39,31 @@ MongoClient.connect(connectionURL, { useUnifiedTopology: true },
         //     console.log(count)
         // })
 
-        db.collection('users').updateOne({ _id: new ObjectId('5ec06dfb6b27d45924bfa5a6')},
-        {
-            $set: {
-                name: 'Mike'
-            }
-        }).then((result) => {
-        console.log(result)
-    }).catch((error) => {
-        console.log(error)
-    })
+    //     db.collection('users').updateOne({ _id: new ObjectId('5ec06dfb6b27d45924bfa5a6')},
+    //     {
+    //         $inc: {
+    //             age: 1
+    //         }
+    //     }).then((result) => {
+    //     console.log(result)
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
+
+        // db.collection('tasks').updateMany({ completed: false} ,
+        // {
+        //     $set: {
+        //         completed: true
+        //     }
+        // }).then(result => console.log(result))
+        //     .catch((error) => { console.log(error)})
+
+        // db.collection('tasks').deleteOne({ _id: ObjectId("5ec0726c2dff9f5a18010959")})
+        //     .then(response => console.log(response))
+        //         .catch(error => console.log(error))
+
+        db.collection('tasks').deleteMany({ age: 27 })
+            .then(response => console.log(response))
+            .catch(error => console.log(error))     
 
 })
