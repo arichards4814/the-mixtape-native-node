@@ -32,6 +32,18 @@ const User = mongoose.model('User', {
         },
         trim: true,
         lowercase: true
+    },
+    password: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: [6, "Password must be more than 6 Characters."],
+        maxlength: [12, "Password must be less than 12 Characters."],
+        validate(value){
+            if(value === 'password'){
+                throw new Error('Password cannot be password.')
+            }
+        }
     }
 })
 
@@ -56,7 +68,7 @@ const Mixtape = mongoose.model('Mixtape', {
     }
 })
 
-const me = new User({ username: "  Jerry  ", email: "mike@com.com"})
+const me = new User({ username: "Billy123", email: "mike@com.com", password: "password"})
 me.save()
     .then((resp) => console.log(me))
         .catch((error) => console.log(error))
