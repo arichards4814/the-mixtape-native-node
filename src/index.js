@@ -1,5 +1,5 @@
 const express = require('express')
-require('./db/mongoose')
+require('./db/mongoose.js')
 const User = require('./models/user')
 const Mixtape = require('./models/mixtape')
 
@@ -10,80 +10,92 @@ app.use(express.json())
 //auto parse req to json
 
 
-//on /users post will create a new Mixtape
+//on /users post will create a new user
 app.post('/users', async (req, res) => {
-    const user = new User(req.body)
 
     try {
-        await user.save()
+        const user = await User(req.body)
+        if (!user) {
+            return res.status(404).send()
+        }
         res.status(201).send(user)
     } catch (e) {
         res.status(400).send(e)
     }
 })
 
-app.get('/users', (req, res) => {
-    User.find({}).then((users) => {
-        res.status(200).send(users)
-    }).catch((e) => {
+app.get('/users', async (req, res) => {
+
+    try {
+        const users = await User.find({})
+        res.send(users)
+    } catch(e) {
         res.status(500).send()
-    })
+    }
 })
 
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
 
-    User.findById(_id).then((user) => {
+    try {
+        const user = await User.findById(_id)
         if(!user){
             return res.status(404)
-            //user not found
         }
-
         res.send(user)
-        //status will be 200
-    }).catch((e)=> {
-        //internal server error
-            res.status(500).send()
-    })
-
+    } catch(e) {
+        res.status(500).send()
+    }
 })
 
 //on /mixtapes post will create a new Mixtape
-app.post('/mixtapes', (req, res) => {
-    const mixtape = new Mixtape(req.body)
-    mixtape.save().then(() => {
-        res.status(201).send(mixtape)
-    })
-        .catch((error) => {
-            res.status(400).send(error)
-        })
-})
-
-
-app.get('/mixtapes', (req, res) => {
-    Mixtape.find({}).then((mixtapes) => {
-        res.status(200).send(mixtapes)
-    }).catch((e) => {
-        res.status(500).send()
-    })
-})
-
-app.get('/mixtapes/:id', (req, res) => {
-    const _id = req.params.id
-
-    Mixtape.findById(_id).then((mixtape) => {
-        if (!mixtape) {
-            return res.status(404)
-            //user not found
+app.post('/mixtapes', async (req, res) => {
+    
+    try{
+        const mixtape = await Mixtape(req.body)
+        if(!mixtape){
+            return res.status(404).send()
         }
-
         res.send(mixtape)
-        //status will be 200
-    }).catch((e) => {
-        //internal server error
-        res.status(500).send()
-    })
+    } catch(e){
+        res.status(400).send()
+    }
+})
 
+
+app.get('/mixtapes', async (req, res) => {
+    try{
+        const mixtapes = await Mixtape.find({})
+        
+        res.send(mixtapes)
+    } catch(e){
+        res.status(500).send()
+    }
+})
+
+app.get('/mixtapes/:id', async (req, res) => {
+
+    const _id = req.params.id 
+
+    try{
+        const mixtape = await Mixtape.findById(_id)
+        res.send(mixtape)
+    } catch (e){
+        res.status(500).send()
+    }
+
+})
+
+app.patch('/users/:id', async (req, res) => {
+    try{
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
+        if(!user){
+            return res.status(404).send()
+        }
+        res.send(user)
+    } catch (e) {
+        res.status(400).send(e)
+    }
 })
 
 
