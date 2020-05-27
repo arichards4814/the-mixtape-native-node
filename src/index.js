@@ -2,13 +2,14 @@ const express = require('express')
 require('./db/mongoose.js')
 const User = require('./models/user')
 const Mixtape = require('./models/mixtape')
+const userRouter = require('./routers/user')
 
 const app = express()
 const port = process.env.PORT || 3000
 
 app.use(express.json())
+app.use(userRouter)
 //auto parse req to json
-
 
 //on /users post will create a new user
 app.post('/users', async (req, res) => {
