@@ -11,7 +11,7 @@ router.post('/mixtapes', async (req, res) => {
         if (!mixtape) {
             return res.status(404).send()
         }
-        mixtape.save()
+        await mixtape.save()
         res.send(mixtape)
     } catch (e) {
         res.status(400).send()
@@ -52,7 +52,12 @@ router.patch('/mixtapes/:id', async (req, res) => {
     }
 
     try {
-        const mixtape = await Mixtape.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        const mixtape = await Mixtape.findById(req.params.id)
+        
+        updates.forEach((update) => mixtape[update] = req.body[update])
+        
+        await mixtape.save()
+        // const mixtape = await Mixtape.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
         if (!mixtape) {
             return res.status(404).send()
         }

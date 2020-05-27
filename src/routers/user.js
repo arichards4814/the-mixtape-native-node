@@ -3,11 +3,6 @@ const router = new express.Router()
 const User = require('../models/user')
 
 
-router.get('/test', (req, res) => {
-    res.send('This is from my other router')
-})
-
-
 //on /users post will create a new user
 router.post('/users', async (req, res) => {
 
@@ -16,7 +11,9 @@ router.post('/users', async (req, res) => {
         if (!user) {
             return res.status(404).send()
         }
-        res.status(201).send(user)
+            await user.save()
+            res.status(201).send(user)
+        
     } catch (e) {
         res.status(400).send(e)
     }
@@ -48,7 +45,7 @@ router.get('/users/:id', async (req, res) => {
 
 router.patch('/users/:id', async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['username', 'age']
+    const allowedUpdates = ['username', 'password', 'email']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -56,7 +53,12 @@ router.patch('/users/:id', async (req, res) => {
     }
 
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        const user = await User.findById(req.params.id)
+
+        updates.forEach((update) => user[update] = req.body[update])
+
+        await user.save()
+        // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
         if (!user) {
             return res.status(404).send()
         }
