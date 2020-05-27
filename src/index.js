@@ -48,14 +48,48 @@ app.get('/users/:id', async (req, res) => {
     }
 })
 
+app.patch('/users/:id', async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['username', 'age']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({ error: 'Invalid updates.' })
+    }
+
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        if (!user) {
+            return res.status(404).send()
+        }
+        res.send(user)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
+
+app.delete('/users/:id', async(req, res) => {
+    try{
+        const user = await User.findByIdAndDelete(req.params.id)
+        if(!user){
+            return res.status(404).send()
+        }
+
+        res.send(user)
+    } catch(e){
+        res.status(500).send()
+    }
+})
+
 //on /mixtapes post will create a new Mixtape
 app.post('/mixtapes', async (req, res) => {
     
     try{
-        const mixtape = await Mixtape(req.body)
+        const mixtape = await new Mixtape(req.body)
         if(!mixtape){
             return res.status(404).send()
         }
+        mixtape.save()
         res.send(mixtape)
     } catch(e){
         res.status(400).send()
@@ -84,23 +118,38 @@ app.get('/mixtapes/:id', async (req, res) => {
     }
 })
 
-app.patch('/users/:id', async (req, res) => {
+
+
+app.patch('/mixtapes/:id', async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['username', 'age']
+    const allowedUpdates = ['title', 'description', 'color', 'backgroundColor', 'private', 'collaborative']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
-    if(!isValidOperation){
-        return res.status(400).send({error: 'Invalid updates.'})
+    if (!isValidOperation) {
+        return res.status(400).send({ error: 'Invalid updates.' })
     }
 
-    try{
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
-        if(!user){
+    try {
+        const mixtape = await Mixtape.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        if (!mixtape) {
             return res.status(404).send()
         }
-        res.send(user)
+        res.send(mixtape)
     } catch (e) {
         res.status(400).send(e)
+    }
+
+})
+
+app.delete('/mixtapes/:id', async (req, res) => {
+    try {
+        const mixtape = await Mixtape.findByIdAndDelete(req.params.id)
+        if (!mixtape) {
+            return res.status(404).send()
+        }
+        res.send(mixtape)
+    } catch (e) {
+        res.status(500).send()
     }
 })
 
