@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -26,7 +27,8 @@ const userSchema = new mongoose.Schema({
             }
         },
         trim: true,
-        lowercase: true
+        lowercase: true,
+        unique: true
     },
     password: {
         type: String,
@@ -39,11 +41,46 @@ const userSchema = new mongoose.Schema({
                 throw new Error('Password cannot be password.')
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
+
+//create method for instance of user
+//must be normal function
+userSchema.methods.generateAuthToken = async function (){
+    const user = this
+    const token = jwt.sign({ _id: user._id.toString()}, 'thisismynewcourse') // convert the objectID to a string
+    
+    user.tokens = user.tokens.concat({ token })
+    
+    user.save() // he has this as an await. but it only works for me when we're not awaiting.
+    return token
+}
+
+//a static is a class method
+userSchema.statics.findByCredentials = async (email, password) => {
+    const user = await User.findOne({ email })
+    if(!user){
+        throw new Error('Unable to login')
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    if(!isMatch){
+        throw new Error('Unable to login')
+    }
+    console.log("User Found")
+    return user
+}
+
 
 //must use a standard function for this
 //binding plays an important part
+//hash the plaintext password before saving
 userSchema.pre('save', async function(next) {
     const user = this
 
