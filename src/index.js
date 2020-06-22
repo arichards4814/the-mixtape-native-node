@@ -6,6 +6,20 @@ const mixtapeRouter = require('./routers/mixtape')
 const app = express()
 const port = process.env.PORT || 3000
 
+//use is for middleware
+// app.use((req, res, next) => {
+//     if(req.method === 'GET'){
+//         res.send('GET requests are disabled.')
+//     } else {
+//         next()
+//     }
+// })
+
+//check for incoming authentication token
+// app.use((req, res, next) => {
+//     res.send('App is currently in maintenance mode', 503)
+// })
+
 app.use(express.json()) //auto parse req to json
 app.use(userRouter)
 app.use(mixtapeRouter)
@@ -14,13 +28,13 @@ app.listen(port, () => {
     console.log("Server is up on port " + port)
 })
 
-const jwt = require('jsonwebtoken')
-
-const myFunction = async () => {
-    const token = jwt.sign({ _id: 'abc123'}, 'thisismynewcourse', { expiresIn: '7 days'})
-    console.log(token)
-    jwt.verify(token, 'thisismynewcourse')
+const pet = {
+    name: 'Hal'
 }
 
+pet.toJSON = function () {
+    console.log(this)
+    return {}
+}
 
-myFunction()
+console.log(JSON.stringify(pet))

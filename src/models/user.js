@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
         minlength: [6, "Password must be more than 6 Characters."],
-        maxlength: [12, "Password must be less than 12 Characters."],
+        // maxlength: [12, "Password must be less than 12 Characters."],
         validate(value) {
             if (value === 'password') {
                 throw new Error('Password cannot be password.')
@@ -49,6 +49,16 @@ const userSchema = new mongoose.Schema({
         }
     }]
 })
+
+userSchema.methods.toJSON = function () {
+    const user = this 
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
+}
 
 //create method for instance of user
 //must be normal function

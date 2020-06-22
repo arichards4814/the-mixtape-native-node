@@ -1,18 +1,20 @@
 const express = require('express')
 const router = new express.Router()
+const auth = require('../middleware/auth')
 const Mixtape = require('../models/mixtape')
 
 
 //on /mixtapes post will create a new Mixtape
-router.post('/mixtapes', async (req, res) => {
+router.post('/mixtapes', auth, async (req, res) => {
+
+    const mixtape = new Mixtape({
+        ...req.body,
+        owner: req.user._id
+    })
 
     try {
-        const mixtape = await new Mixtape(req.body)
-        if (!mixtape) {
-            return res.status(404).send()
-        }
         await mixtape.save()
-        res.send(mixtape)
+        res.status(201).send(mixtape)
     } catch (e) {
         res.status(400).send()
     }
