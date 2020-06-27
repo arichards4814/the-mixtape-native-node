@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const Mixtape = require('./mixtape')
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -48,6 +49,18 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }]
+})
+
+userSchema.virtual('mixtapes', {
+    ref: 'Mixtape',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
+userSchema.virtual('badges', {
+    ref: 'Badge',
+    localField: '_id',
+    foreignField: 'owner'
 })
 
 userSchema.methods.toJSON = function () {
@@ -100,6 +113,13 @@ userSchema.pre('save', async function(next) {
     }
 
     next() //next must be called to end the function
+})
+
+//delete users mixtapes if the user deletes themselves
+userSchema.pre('remove', async function(next){
+    const user = this
+    await Mixtape.deleteMany({ owner: user._id})
+    next()
 })
 
 const User = mongoose.model('User', userSchema)

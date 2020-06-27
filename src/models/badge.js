@@ -13,6 +13,11 @@ const Badge = mongoose.model('Badge', {
         required: true,
         maxlength: [260, "Cannot have more than 260 characters."],
         trim: true
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 })
 

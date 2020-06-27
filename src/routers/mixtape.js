@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const auth = require('../middleware/auth')
 const Mixtape = require('../models/mixtape')
+const User = require('../models/user')
 
 
 //on /mixtapes post will create a new Mixtape
@@ -31,6 +32,15 @@ router.get('/mixtapes', async (req, res) => {
     }
 })
 
+router.get('/mymixtapes', auth, async (req, res) => {
+    try {
+        await req.user.populate('mixtapes').execPopulate()
+        res.send(req.user.mixtapes)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
 router.get('/mixtapes/:id', async (req, res) => {
     const _id = req.params.id
 
@@ -44,7 +54,7 @@ router.get('/mixtapes/:id', async (req, res) => {
 
 
 
-router.patch('/mixtapes/:id', async (req, res) => {
+router.patch('/mixtapes/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['title', 'description', 'color', 'backgroundColor', 'private', 'collaborative']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -53,16 +63,18 @@ router.patch('/mixtapes/:id', async (req, res) => {
         return res.status(400).send({ error: 'Invalid updates.' })
     }
 
+    const _id = req.params.id
     try {
-        const mixtape = await Mixtape.findById(req.params.id)
-        
-        updates.forEach((update) => mixtape[update] = req.body[update])
-        
-        await mixtape.save()
-        // const mixtape = await Mixtape.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        const mixtape = await Mixtape.findOne({ _id, owner: req.user._id })
+
         if (!mixtape) {
             return res.status(404).send()
         }
+
+        updates.forEach((update) => mixtape[update] = req.body[update])
+        
+        await mixtape.save()
+
         res.send(mixtape)
     } catch (e) {
         res.status(400).send(e)
@@ -70,9 +82,11 @@ router.patch('/mixtapes/:id', async (req, res) => {
 
 })
 
-router.delete('/mixtapes/:id', async (req, res) => {
+router.delete('/mixtapes/:id', auth,  async (req, res) => {
+    
     try {
-        const mixtape = await Mixtape.findByIdAndDelete(req.params.id)
+        const mixtape = await Mixtape.findOneAndDelete({_id: req.params.id, owner: req.user._id})
+
         if (!mixtape) {
             return res.status(404).send()
         }
