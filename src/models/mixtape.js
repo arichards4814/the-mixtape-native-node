@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 
-const Mixtape = mongoose.model('Mixtape', {
+const mixtapeSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -30,7 +30,12 @@ const Mixtape = mongoose.model('Mixtape', {
         required: true,
         ref: 'User'
     }
-})
+},
+    {
+        timestamps: true
+    })
 
+
+const Mixtape = mongoose.model('Mixtape', mixtapeSchema)
 
 module.exports = Mixtape

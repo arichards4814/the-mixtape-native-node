@@ -21,7 +21,6 @@ router.post('/mixtapes', auth, async (req, res) => {
     }
 })
 
-
 router.get('/mixtapes', async (req, res) => {
     try {
         const mixtapes = await Mixtape.find({})
@@ -33,8 +32,19 @@ router.get('/mixtapes', async (req, res) => {
 })
 
 router.get('/mymixtapes', auth, async (req, res) => {
+    let match = {}
+
+    if(req.query.collaborative){
+        match = {
+            collaborative:  req.query.collaborative === 'true'
+        }
+    }
+
     try {
-        await req.user.populate('mixtapes').execPopulate()
+        await req.user.populate({
+            path: 'mixtapes',
+            match
+        }).execPopulate()
         res.send(req.user.mixtapes)
     } catch (e) {
         res.status(500).send()
